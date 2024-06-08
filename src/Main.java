@@ -1,6 +1,6 @@
 ////////////////////////////////////// NICCOLO' CASELLI 7115264 //////////////////////////////////////////////////////////////
 // Errori:
-// La sintatti è coretta ad eccezine di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe InputQueue
+// La sintatti è tutta coretta ad eccezine di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe InputQueue
 // e ho creato un array di ArrayList di int e non di Integer.
 // Per quanto riguarda la logica ho dimenticato di incremenetare completed_count nel ProcessorThread.
 // Per quanto rigurda il main ho dimenticato lo sleep, quindi ovviamente il programma terminava subito.
@@ -95,6 +95,7 @@ class InputQueue {
         int n = 0;
         for (int i = 0; i < N; i++) {
             n += queue[i].size();
+            System.out.println("Queue 1_" + i + " size: " + queue[i].size()); // TODO: remove
         }
         return n;
     }
@@ -154,8 +155,8 @@ class Generator extends Thread {
            while (true) {
                int value = (id +1)+ count;
                count++;
-               produced_count++;
                input.put(id, value);
+               produced_count++;
                sleep(x);
            }
        }
@@ -196,7 +197,11 @@ class ProcessorThread extends Thread{
 
                 ProcessorResult result = new ProcessorResult(res, payload.extractionId, payload.values);
 
+                System.out.println(getName() + " is working on: " + Arrays.toString(payload.values)); // TODO: remove
+
                 output.put(result);
+
+                System.out.println(getName() + " processed: " + Arrays.toString(payload.values) + " result: " + res); // TODO: remove
 
                 completed_count++;
             }
@@ -245,24 +250,25 @@ public class Main {
 
 
         for (int i = 0; i < N; i++) {
-            generators[i] = new Generator(1000, i, input);
+            generators[i] = new Generator(500, i, input);
             generators[i].start();
         }
 
         for (int i = 0; i < M; i++) {
             processors[i] = new ProcessorThread(input, output, 1000, 1000);
             processors[i].start();
+            processors[i].setName("Processor " + i); // TODO: remove
         }
 
         printer.start();
 
-        Thread.sleep(10000); // <-- MI SONO DIMENTICATO DI METTERE LO SLEEP
+        Thread.sleep(10000); // <-- mi sono dimenticato di fare lo sleep
 
         for (int i = 0; i < N; i++) generators[i].interrupt();
         for (int i = 0; i < M; i++) processors[i].interrupt();
         for (int i = 0; i < N; i++) generators[i].join();
         for (int i = 0; i < M; i++) processors[i].join();
-        // MI SONO DIMENTICATO DI FARE IL JOIN DEL PRINTER
+        // mi sono dimenticato di fare il join per il printer
         printer.interrupt();
         printer.join();
 
