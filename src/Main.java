@@ -4,10 +4,10 @@ import java.util.Arrays;
 ////////////////////////////////////// NICCOLO' CASELLI 7115264 //////////////////////////////////////////////////////////////
 //
 // ERRORI:
-// La sintassi è coretta ad eccezine di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe
+// La sintassi è corretta ad eccezione di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe
 // InputQueue e ho creato un array di ArrayList di int e non di Integer.
 // Per quanto riguarda la logica ho dimenticato di incremenetare completed_count nel ProcessorThread.
-// Per quanto rigurda il main ho dimenticato lo sleep, quindi ovviamente il programma terminava subito.
+// Per quanto riguarda il main ho dimenticato lo sleep, quindi il programma terminava subito.
 // Ho inoltre interrotto e fatto il join per generatori e i processori ma ho dimenticato  il printer.
 //
 // LA SINCRONIZZAZIONE FUNZIONA
@@ -19,7 +19,7 @@ import java.util.Arrays;
 // i valori processati e quelli in coda ad ogni esecuzione del programma, si perdono sempre M elementi.
 // Questo è dovuto al modo in cui viene gestita l'interruzione dei thread (nel testo di esame è specificato
 // di interrompere tutti i thread senza particolari accorgimenti).
-// Ovviamente, è degno di nota che per far tornare i conti basta spostare l'incremento di completed_count dei
+// Se si vuole far tornare i conti basta spostare l'incremento di completed_count dei
 // ProcessorThread prima dell'inserimento nella coda di output (o gestire diversamente l'interruzione).
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
