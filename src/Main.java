@@ -1,16 +1,29 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 ////////////////////////////////////// NICCOLO' CASELLI 7115264 //////////////////////////////////////////////////////////////
-// Errori:
-// La sintatti è tutta coretta ad eccezine di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe InputQueue
-// e ho creato un array di ArrayList di int e non di Integer.
+//
+// ERRORI:
+// La sintassi è coretta ad eccezine di due sviste: ho  dimenticato il tipo di ritorno del metodo getSize() della classe
+// InputQueue e ho creato un array di ArrayList di int e non di Integer.
 // Per quanto riguarda la logica ho dimenticato di incremenetare completed_count nel ProcessorThread.
 // Per quanto rigurda il main ho dimenticato lo sleep, quindi ovviamente il programma terminava subito.
 // Ho inoltre interrotto e fatto il join per generatori e i processori ma ho dimenticato  il printer.
-// La sincronizzazione funziona.
+//
+// LA SINCRONIZZAZIONE FUNZIONA
+//
+// DEBUGGING:
+// A seconda del valore di attesa X si possono avere o non avere elementi rimanenti nella coda di input.
+// (Ad esempio ho notato che con x=500 non rimangono elementi).
+// Inoltre, per come è stato implementato il programma, si può notare con le stampe che se si sommano
+// i valori processati e quelli in coda ad ogni esecuzione del programma, si perdono sempre M elementi.
+// Questo è dovuto al modo in cui viene gestita l'interruzione dei thread (nel testo di esame è specificato
+// di interrompere tutti i thread senza particolari accorgimenti).
+// Ovviamente, è degno di nota che per far tornare i conti basta spostare l'incremento di completed_count dei
+// ProcessorThread prima dell'inserimento nella coda di output (o gestire diversamente l'interruzione).
+//
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 class InputQueueResponse {
     public int [] values;
@@ -153,7 +166,7 @@ class Generator extends Thread {
     public void run() {
        try {
            while (true) {
-               int value = (id +1)+ count;
+               int value = (id + 1) + count;
                count++;
                input.put(id, value);
                produced_count++;
@@ -197,11 +210,7 @@ class ProcessorThread extends Thread{
 
                 ProcessorResult result = new ProcessorResult(res, payload.extractionId, payload.values);
 
-                System.out.println(getName() + " is working on: " + Arrays.toString(payload.values)); // TODO: remove
-
                 output.put(result);
-
-                System.out.println(getName() + " processed: " + Arrays.toString(payload.values) + " result: " + res); // TODO: remove
 
                 completed_count++;
             }
@@ -237,11 +246,13 @@ class PrinterThread extends Thread {
 
 
 public class Main {
-    public static void main(String[] args) throws  InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         Counter counter = new Counter();
+
         int N = 4;
         int M = 3;
         int L = 10;
+
         InputQueue input = new InputQueue(N, L, counter);
         UnlimitedQueue output = new UnlimitedQueue();
         Generator[] generators = new Generator[N];
@@ -250,7 +261,7 @@ public class Main {
 
 
         for (int i = 0; i < N; i++) {
-            generators[i] = new Generator(500, i, input);
+            generators[i] = new Generator(200, i, input);
             generators[i].start();
         }
 
@@ -264,6 +275,7 @@ public class Main {
 
         Thread.sleep(10000); // <-- mi sono dimenticato di fare lo sleep
 
+
         for (int i = 0; i < N; i++) generators[i].interrupt();
         for (int i = 0; i < M; i++) processors[i].interrupt();
         for (int i = 0; i < N; i++) generators[i].join();
@@ -271,6 +283,7 @@ public class Main {
         // mi sono dimenticato di fare il join per il printer
         printer.interrupt();
         printer.join();
+
 
         int total_generated = 0;
         for (int i = 0; i < N; i++) {
@@ -288,6 +301,5 @@ public class Main {
         System.out.println("Total printed: " + printer.count);
         System.out.println("In queue 1: " + input.getSize());
         System.out.println("In queue 2: " + output.getSize());
-
     }
 }
